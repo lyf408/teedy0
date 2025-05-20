@@ -14,7 +14,23 @@
     "password_lost_sent_title": "密码重置邮件已发送",
     "password_lost_sent_message": "重置密码的邮件已经发送至<strong>{{ username }}</strong>",
     "password_lost_error_title": "密码重置出错",
-    "password_lost_error_message": "无法发送密码重置邮件，请联系您的管理员进行手动重置"
+    "password_lost_error_message": "无法发送密码重置邮件，请联系您的管理员进行手动重置",
+    "register": "注册"
+  },
+  "register": {
+    "title": "注册",
+    "username": "用户名",
+    "username_required": "请输入用户名",
+    "username_pattern": "用户名只能包含字母、数字和下划线",
+    "email": "注册邮箱",
+    "email_required": "请输入注册邮箱",
+    "email_invalid": "邮箱不符合格式",
+    "email_length": "邮箱长度必须在 3 到 254 个字符之间",
+    "error_title": "注册错误",
+    "error_username_exists": "用户名已存在",
+    "error_email_exists": "邮箱已存在",
+    "cancel": "取消",
+    "submit": "提交"
   },
   "passwordlost": {
     "title": "丢失密码",
@@ -242,6 +258,7 @@
     "menu_general_settings": "一般设置",
     "menu_workflow": "工作流程",
     "menu_users": "用户",
+    "menu_registration": "注册申请",
     "menu_groups": "群组",
     "menu_vocabularies": "词条",
     "menu_configuration": "配置",
@@ -272,6 +289,20 @@
         "password_lost_sent_title": "密码重置邮件已发送",
         "password_lost_sent_message": "密码重置电子邮件已发送至 <strong>{{ username }}</strong>"
       }
+    },
+    "registration": {
+      "title": "注册申请",
+      "username": "用户名",
+      "email": "注册邮箱",
+      "date": "注册日期",
+      "operations": "操作",
+      "accept_btn": "接受",
+      "reject_btn": "拒绝",
+      "accept_title": "接受申请",
+      "accept_message": "确定要接受该申请吗？",
+      "reject_title": "拒绝申请",
+      "reject_message": "确定要拒绝该申请吗？",
+      "no_request": "当前没有申请"
     },
     "workflow": {
       "title": "工作流程<small>配置</small>",

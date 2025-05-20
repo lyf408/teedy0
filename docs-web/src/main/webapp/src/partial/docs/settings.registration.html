@@ -1,0 +1,45 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-header">
+            <h1>{{ 'settings.registration.title' | translate }}</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div ng-show="!registrations || registrations.length === 0" class="alert alert-info">
+            {{ 'settings.registration.no_request' | translate }}
+        </div>
+
+        <div class="table-responsive" ng-if="registrations.length > 0">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>{{ 'settings.registration.username' | translate }}</th>
+                        <th>{{ 'settings.registration.email' | translate }}</th>
+                        <th>{{ 'settings.registration.date' | translate }}</th>
+                        <th>{{ 'settings.registration.operations' | translate }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="registration in registrations">
+                        <td>{{ registration.username }}</td>
+                        <td>{{ registration.email }}</td>
+                        <td>{{ registration.create_date | date:'medium' }}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" ng-click="acceptRegistration(registration)"
+                                title="{{ 'settings.registration.accept_btn' | translate }}">
+                                {{ 'settings.registration.accept_btn' | translate }}
+                            </button>
+                            <button class="btn btn-danger btn-sm" ng-click="rejectRegistration(registration)"
+                                title="{{ 'settings.registration.reject_btn' | translate }}">
+                                {{ 'settings.registration.reject_btn' | translate }}
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

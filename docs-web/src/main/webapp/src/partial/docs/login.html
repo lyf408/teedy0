@@ -35,13 +35,13 @@
           <div class="form-group">
             <label class="sr-only" for="inputUsername">{{ 'login.username' | translate }}</label>
             <input class="form-control" type="text" id="inputUsername" name="username"
-                   ng-attr-placeholder="{{ 'login.username' | translate }}" ng-model="user.username" />
+              ng-attr-placeholder="{{ 'login.username' | translate }}" ng-model="user.username" />
           </div>
 
           <div class="form-group">
             <label class="sr-only" for="inputPassword">{{ 'login.password' | translate }}</label>
             <input class="form-control" type="password" id="inputPassword" name="password"
-                   ng-attr-placeholder="{{ 'login.password' | translate }}" ng-model="user.password" />
+              ng-attr-placeholder="{{ 'login.password' | translate }}" ng-model="user.password" />
           </div>
 
           <span class="help-block" ng-if="codeRequired">
@@ -51,7 +51,7 @@
           <div class="form-group" ng-if="codeRequired">
             <label class="sr-only" for="inputCode">{{ 'login.validation_code' | translate }}</label>
             <input class="form-control" type="text" id="inputCode" name="code"
-                   ng-attr-placeholder="{{ 'login.validation_code' | translate }}" ng-model="user.code" />
+              ng-attr-placeholder="{{ 'login.validation_code' | translate }}" ng-model="user.code" />
           </div>
 
           <div class="checkbox text-muted">
@@ -67,18 +67,24 @@
               </button>
             </div>
 
-            <div class="col-md-6 text-right btn-password-lost">
+            <div class="col-md-6">
+              <button type="button" class="btn btn-primary" ng-click="openRegister()">
+                <span class="fas fa-check"></span> {{ 'login.register' | translate }}
+              </button>
+            </div>
+
+            <div class="col-md-12 text-right btn-password-lost">
               <div class="well-sm">
                 <a href ng-click="openPasswordLost()">{{ 'login.password_lost_btn' | translate }}</a>
               </div>
             </div>
           </div>
 
-          <p class="text-center" ng-if="app.guest_login">&nbsp;</p>
+          <!-- <p class="text-center">&nbsp;</p>
 
-          <button type="submit" class="btn btn-default btn-block" ng-if="app.guest_login" ng-click="loginAsGuest()">
+          <button type="submit" class="btn btn-default btn-block" ng-click="loginAsGuest()">
             <span class="fas fa-user"></span> {{ 'login.login_as_guest' | translate }}
-          </button>
+          </button> -->
         </form>
       </div>
     </div>

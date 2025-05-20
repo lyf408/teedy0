@@ -1,0 +1,44 @@
+<div class="modal-header">
+    <h3 class="modal-title">{{ 'register.title' | translate }}</h3>
+</div>
+<div class="modal-body">
+    <div class="alert alert-danger" ng-if="error">
+        <strong>{{ error.title }}</strong><br>
+        {{ error.message }}
+    </div>
+    <form name="requestForm">
+        <div class="form-group">
+            <label for="inputUsername">{{ 'register.username' | translate }}</label>
+            <input type="text" class="form-control" id="inputUsername" name="username" ng-model="request.username"
+                required ng-minlength="3" ng-maxlength="50" ng-pattern="/^[a-zA-Z0-9_@.-]+$/" />
+            <span class="help-block" ng-show="requestForm.username.$error.required">
+                {{ 'register.username_required' | translate }}
+            </span>
+            <span class="help-block" ng-show="requestForm.username.$error.pattern">
+                {{ 'register.username_pattern' | translate }}
+            </span>
+        </div>
+        <div class="form-group">
+            <label for="inputEmail">{{ 'register.email' | translate }}</label>
+            <input type="email" class="form-control" id="inputEmail" name="email" ng-model="request.email" required
+                ng-maxlength="100" />
+            <span class="help-block" ng-show="requestForm.email.$error.required">
+                {{ 'register.email_required' | translate }}
+            </span>
+            <span class="help-block" ng-show="requestForm.email.$error.email">
+                {{ 'register.email_invalid' | translate }}
+            </span>
+            <span class="help-block" ng-show="requestForm.email.$error.maxlength">
+                {{ 'register.email_length' | translate }}
+            </span>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">
+        {{ 'register.cancel' | translate }}
+    </button>
+    <button class="btn btn-primary" ng-click="submit()" ng-disabled="requestForm.$invalid">
+        {{ 'register.submit' | translate }}
+    </button>
+</div>
