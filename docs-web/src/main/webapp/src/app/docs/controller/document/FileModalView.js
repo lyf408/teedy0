@@ -3,7 +3,7 @@
 /**
  * File modal view controller.
  */
-angular.module('docs').controller('FileModalView', function ($uibModalInstance, $scope, $state, $stateParams, $sce, Restangular, $transitions, $filter, $interval) {
+angular.module('docs').controller('FileModalView', function ($uibModalInstance, $scope, $state, $stateParams, $sce, Restangular, $transitions, $filter, $interval, $uibModal) {
   var setFile = function (files) {
     // Search current file
     _.each(files, function (value) {
@@ -73,14 +73,57 @@ angular.module('docs').controller('FileModalView', function ($uibModalInstance, 
     }
   };
 
+  $scope.languageOptions = {
+    'zh-CHS': '简体中文',
+    'en': '英语',
+    'ja': '日语',
+    'ko': '韩语',
+    'fr': '法语',
+    'de': '德语',
+    'es': '西班牙语',
+    'ru': '俄语'
+  };
+
+  // 默认翻译方向
+  $scope.translation = {
+    from: 'zh-CHS',
+    to: 'en'
+  };
+
   $scope.translateFile = function() {
+    $scope.openTranslationDialog();
+  };
+
+  $scope.openTranslationDialog = function() {
+    var modalInstance = $uibModal.open({
+      templateUrl: 'partial/docs/translationDialog.html',
+      controller: 'TranslationDialogController',
+      resolve: {
+        languages: function() {
+            return $scope.languageOptions;
+        }
+      }
+    });
+
+    modalInstance.result.then(function(translation) {
+      // 用户确认翻译，执行翻译流程
+      $scope.translation = translation;
+      $scope.startTranslationProcess();
+    }, function() {
+      // 用户取消翻译
+      console.log('Translation cancelled');
+    });
+  };
+
+  $scope.startTranslationProcess = function() {
     // 初始化状态
     $scope.isTranslating = true;
     $scope.translationStatusMessage = $filter('translate')('file.translation.submitting')
     // 1. 提交翻译请求
+    console.log($scope.translation);
     Restangular.one('file', $stateParams.fileId).post('translation/submit', {
-      from: 'en', // 默认中文
-      to: 'zh-CHS'        // 默认英文
+      from: $scope.translation.from, 
+      to: $scope.translation.to
     }).then(function(response) {
       // 2. 获取翻译任务ID
       var flownumber = response.flownumber;

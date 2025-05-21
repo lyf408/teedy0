@@ -1,0 +1,22 @@
+<!-- translation-dialog.html -->
+<div class="modal-header">
+    <h3 class="modal-title">文档翻译</h3>
+</div>
+<div class="modal-body">
+    <div class="form-group">
+        <label for="sourceLang">原始语言</label>
+        <select id="sourceLang" class="form-control" ng-model="translation.from"
+                ng-options="code as name for (code, name) in languageOptions">
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="targetLang">目标语言</label>
+        <select id="targetLang" class="form-control" ng-model="translation.to"
+                ng-options="code as name for (code, name) in languageOptions">
+        </select>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">开始翻译</button>
+    <button class="btn btn-default" ng-click="cancel()">取消</button>
+</div>

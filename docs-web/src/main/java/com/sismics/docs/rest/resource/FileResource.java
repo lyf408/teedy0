@@ -659,10 +659,11 @@ public class FileResource extends BaseResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response submitTranslation(
             @PathParam("id") final String fileId,
-            @QueryParam("share") String shareId,
-            @QueryParam("from") @DefaultValue("zh-CHS") String from,
-            @QueryParam("to") @DefaultValue("en") String to) {
+            @FormParam("share") String shareId,
+            @FormParam("from") String from,
+            @FormParam("to") String to) {
 
+        System.out.println(1);
         authenticate();
 
         // 1. 验证文件
@@ -685,6 +686,8 @@ public class FileResource extends BaseResource {
         try {
             tempFile = createTempDecryptedFile(fileId, file.getUserId());
 
+System.out.println("Debug: " + tempFile + " " + fileName + " " + fileType + " " + from + " " + to);
+
             // 4. 提交翻译请求
             String flownumber = com.sismics.docs.core.util.TranslationUtil.upload(
                     tempFile.toString(),
@@ -693,6 +696,7 @@ public class FileResource extends BaseResource {
                     from,
                     to
             );
+            System.out.println(flownumber);
 
             // 返回翻译任务ID
             jakarta.json.JsonObject result = jakarta.json.Json.createObjectBuilder()
@@ -782,7 +786,7 @@ public class FileResource extends BaseResource {
             java.nio.file.Path tempDir = java.nio.file.Paths.get(System.getProperty("java.io.tmpdir"), "translations");
             java.nio.file.Files.createDirectories(tempDir);
 
-            String translatedFileName = com.sismics.docs.core.util.TranslationUtil.download(flownumber, tempDir.toString());
+            String translatedFileName = com.sismics.docs.core.util.TranslationUtil.download(flownumber, tempDir + "/");
             java.nio.file.Path translatedFile = tempDir.resolve(translatedFileName);
 
             // 3. 返回文件流
