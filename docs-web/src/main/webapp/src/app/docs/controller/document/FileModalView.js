@@ -3,7 +3,7 @@
 /**
  * File modal view controller.
  */
-angular.module('docs').controller('FileModalView', function ($uibModalInstance, $scope, $state, $stateParams, $sce, Restangular, $transitions) {
+angular.module('docs').controller('FileModalView', function ($uibModalInstance, $scope, $state, $stateParams, $sce, Restangular, $transitions, $filter, $interval) {
   var setFile = function (files) {
     // Search current file
     _.each(files, function (value) {
