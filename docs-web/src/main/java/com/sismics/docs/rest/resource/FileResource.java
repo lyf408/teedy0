@@ -652,6 +652,159 @@ public class FileResource extends BaseResource {
     }
 
     /**
+     * 提交文件翻译请求
+     */
+    @POST
+    @Path("{id: [a-z0-9\\-]+}/translation/submit")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response submitTranslation(
+            @PathParam("id") final String fileId,
+            @QueryParam("share") String shareId,
+            @QueryParam("from") @DefaultValue("zh-CHS") String from,
+            @QueryParam("to") @DefaultValue("en") String to) {
+
+        authenticate();
+
+        // 1. 验证文件
+        com.sismics.docs.core.model.jpa.File file = findFile(fileId, shareId);
+        String fileName = file.getFullName("data");
+        String[] parts = fileName.split("\\.");
+        if (parts.length < 2) {
+            throw new ClientException("TranslationError", "Invalid file name");
+        }
+
+        // 2. 检查文件类型
+        String fileType = parts[parts.length - 1].toLowerCase();
+        java.util.List<String> allowedTypes = java.util.Arrays.asList("docx", "pdf", "doc", "ppt", "pptx", "xlsx");
+        if (!allowedTypes.contains(fileType)) {
+            throw new ClientException("TranslationError", "Unsupported file type for translation");
+        }
+
+        // 3. 解密并保存临时文件
+        java.nio.file.Path tempFile = null;
+        try {
+            tempFile = createTempDecryptedFile(fileId, file.getUserId());
+
+            // 4. 提交翻译请求
+            String flownumber = com.sismics.docs.core.util.TranslationUtil.upload(
+                    tempFile.toString(),
+                    fileName,
+                    fileType,
+                    from,
+                    to
+            );
+
+            // 返回翻译任务ID
+            jakarta.json.JsonObject result = jakarta.json.Json.createObjectBuilder()
+                    .add("flownumber", flownumber)
+                    .build();
+
+            return Response.ok(result).build();
+
+        } catch (Exception e) {
+            if (tempFile != null) {
+                try { java.nio.file.Files.deleteIfExists(tempFile); } catch (java.io.IOException ignored) {}
+            }
+            throw new ServerException("ServiceUnavailable", "Failed to submit translation: " + e.getMessage());
+        }
+    }
+
+    private java.nio.file.Path createTempDecryptedFile(String fileId, String userId) throws java.io.IOException {
+        java.nio.file.Path tempDir = java.nio.file.Paths.get(System.getProperty("java.io.tmpdir"), "translations");
+        java.nio.file.Files.createDirectories(tempDir);
+
+        java.nio.file.Path tempFile = tempDir.resolve(java.util.UUID.randomUUID().toString());
+        java.nio.file.Path storedFile = com.sismics.docs.core.util.DirectoryUtil.getStorageDirectory().resolve(fileId);
+
+        com.sismics.docs.core.dao.UserDao userDao = new com.sismics.docs.core.dao.UserDao();
+        com.sismics.docs.core.model.jpa.User user = userDao.getById(userId);
+
+        try (java.io.InputStream encrypted = java.nio.file.Files.newInputStream(storedFile);
+             java.io.InputStream decrypted = com.sismics.docs.core.util.EncryptionUtil.decryptInputStream(encrypted, user.getPrivateKey());
+             java.io.OutputStream out = java.nio.file.Files.newOutputStream(tempFile)) {
+            com.google.common.io.ByteStreams.copy(decrypted, out);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return tempFile;
+    }
+
+    /**
+     * 检查翻译状态
+     */
+    @GET
+    @Path("translation/status")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response checkTranslationStatus(
+            @QueryParam("flownumber") String flownumber) {
+
+        if (flownumber == null || flownumber.isEmpty()) {
+            throw new ClientException("NotFound", "Translation task not found");
+        }
+
+        try {
+            int status = com.sismics.docs.core.util.TranslationUtil.query(flownumber);
+
+            jakarta.json.JsonObject result = jakarta.json.Json.createObjectBuilder()
+                    .add("flownumber", flownumber)
+                    .add("status", status)
+                    .build();
+
+            return Response.ok(result).build();
+
+        } catch (Exception e) {
+            throw new ServerException("ServiceUnavailable", "Failed to check translation status: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取翻译结果
+     */
+    @GET
+    @Path("translation/result")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getTranslationResult(
+            @QueryParam("flownumber") String flownumber) {
+
+        if (flownumber == null || flownumber.isEmpty()) {
+            throw new ClientException("NotFound", "Translation task not found");
+        }
+
+        try {
+            // 1. 检查翻译状态
+            int status = com.sismics.docs.core.util.TranslationUtil.query(flownumber);
+            if (status != 4) { // 4表示翻译成功
+                throw new ClientException("NotFound", "Translation not completed or failed");
+            }
+
+            // 2. 下载翻译结果到临时文件
+            java.nio.file.Path tempDir = java.nio.file.Paths.get(System.getProperty("java.io.tmpdir"), "translations");
+            java.nio.file.Files.createDirectories(tempDir);
+
+            String translatedFileName = com.sismics.docs.core.util.TranslationUtil.download(flownumber, tempDir.toString());
+            java.nio.file.Path translatedFile = tempDir.resolve(translatedFileName);
+
+            // 3. 返回文件流
+            StreamingOutput stream = output -> {
+                try (java.io.InputStream in = java.nio.file.Files.newInputStream(translatedFile)) {
+                    ByteStreams.copy(in, output);
+                } finally {
+                    java.nio.file.Files.deleteIfExists(translatedFile);
+                }
+            };
+
+            return Response.ok(stream)
+                    .header("Content-Disposition", "inline; filename=\"translated_" + flownumber + ".pdf\"")
+                    .header("Content-Type", "application/pdf")
+                    .build();
+
+        } catch (Exception e) {
+            throw new ServerException("ServiceUnavailable", "Failed to get translation result: " + e.getMessage());
+        }
+    }
+
+    /**
      * Returns all files from a document, zipped.
      *
      * @api {get} /file/zip Returns all files from a document, zipped.

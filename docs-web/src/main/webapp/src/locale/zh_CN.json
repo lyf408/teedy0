@@ -200,6 +200,17 @@
       "previous": "上一个",
       "next": "下一个",
       "not_found": "文件未找到"
+    },
+    "translation": {
+      "submitting": "正在上传文档...",
+      "queued": "翻译任务排队中，请稍候...",
+      "processing": "正在转换中，请稍候...",
+      "completed": "正在翻译中，请稍候...",
+      "success": "翻译成功!",
+      "failed": "翻译失败，请重试",
+      "error": "翻译服务出错",
+      "timeout": "翻译超时，请重试",
+      "submit_error": "提交翻译请求失败"
     }
   },
   "tag": {

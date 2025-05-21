@@ -22,6 +22,12 @@
   </div>
   
   <div class="btn-group pull-right">
+    <!-- 翻译按钮 -->
+    <button type="button" class="btn btn-default" uib-tooltip="Translate" tooltip-append-to-body="true"
+            ng-click="translateFile()" ng-disabled="isTranslating">
+      <span class="fas fa-language" ng-if="!isTranslating"></span>
+      <span class="fas fa-spinner fa-spin" ng-if="isTranslating"></span>
+    </button>
     <button type="button" class="btn btn-default" uib-tooltip="Print this file" tooltip-append-to-body="true" ng-click="printFile()">
       <span class="fas fa-print"></span>
     </button>
@@ -31,6 +37,11 @@
     <button type="button" class="btn btn-default" uib-tooltip="Show text content" tooltip-append-to-body="true" ng-click="openFileContent()">
       <span class="fas fa-eye"></span>
     </button>
+  </div>
+
+  <!-- 在文件预览区域上方添加翻译状态提示 -->
+  <div class="alert alert-info" ng-if="translationStatusMessage">
+    {{ translationStatusMessage }}
   </div>
 </div>
 

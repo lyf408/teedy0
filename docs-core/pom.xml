@@ -197,6 +197,19 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.13</version> <!-- 或使用最新版本 -->
+    </dependency>
+
+    <!-- JSON.org (org.json) -->
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20231013</version> <!-- 或使用最新版本 -->
+    </dependency>
   </dependencies>
 
   <profiles>

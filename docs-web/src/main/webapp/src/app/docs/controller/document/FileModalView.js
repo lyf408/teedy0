@@ -73,6 +73,68 @@ angular.module('docs').controller('FileModalView', function ($uibModalInstance, 
     }
   };
 
+  $scope.translateFile = function() {
+    // 初始化状态
+    $scope.isTranslating = true;
+    $scope.translationStatusMessage = $filter('translate')('file.translation.submitting')
+    // 1. 提交翻译请求
+    Restangular.one('file', $stateParams.fileId).post('translation/submit', {
+      from: 'en', // 默认中文
+      to: 'zh-CHS'        // 默认英文
+    }).then(function(response) {
+      // 2. 获取翻译任务ID
+      var flownumber = response.flownumber;
+      $scope.translationStatusMessage = $filter('translate')('file.translation.processing');
+
+      // 3. 轮询翻译状态
+      var checkInterval = $interval(function() {
+        Restangular.one('file/translation/status').get({ flownumber: flownumber })
+          .then(function(statusResponse) {
+            switch(statusResponse.status) {
+              case 1: // 排队中
+                $scope.translationStatusMessage = $filter('translate')('file.translation.queued');
+                break;
+              case 2: // 翻译中
+                $scope.translationStatusMessage = $filter('translate')('file.translation.processing');
+                break;
+              case 3:
+              case 5: // 翻译完成
+                $scope.translationStatusMessage = $filter('translate')('file.translation.completed');
+                break;
+              case 4: // 翻译成功
+                $scope.translationStatusMessage = $filter('translate')('file.translation.success');
+                $interval.cancel(checkInterval);
+                $scope.isTranslating = false;
+                // 4. 获取翻译结果
+                window.open('../api/file/translation/result?flownumber=' + flownumber, '_blank');
+                $scope.translationStatusMessage = null;
+                break;
+              default: // 翻译失败
+                $scope.translationStatusMessage = $filter('translate')('file.translation.failed');
+                $interval.cancel(checkInterval);
+                $scope.isTranslating = false;
+                break;
+            }
+          }, function(error) {
+            $interval.cancel(checkInterval);
+            $scope.isTranslating = false;
+            $scope.translationStatusMessage = $filter('translate')('file.translation.error');
+          });
+      }, 2000); // 每1秒检查一
+      // 设置超时（5分钟）
+      $timeout(function() {
+        $interval.cancel(checkInterval);
+        if ($scope.isTranslating) {
+          $scope.isTranslating = false;
+          $scope.translationStatusMessage = $filter('translate')('file.translation.timeout');
+        }
+      }, 60000); // 5分钟超
+    }, function(error) {
+      $scope.isTranslating = false;
+      $scope.translationStatusMessage = $filter('translate')('file.translation.submit_error');
+    });
+  };
+
   /**
    * Open the file in a new window.
    */
