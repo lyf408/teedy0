@@ -159,7 +159,7 @@ public class UserResource extends BaseResource {
         user.setUsername(registration.getUsername());
         user.setPassword("123456");
         user.setEmail(registration.getEmail());
-        user.setStorageQuota(10000L);
+        user.setStorageQuota(1000000000L);
         user.setOnboarding(true);
 
         UserDao userDao = new UserDao();
